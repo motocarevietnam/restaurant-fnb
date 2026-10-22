@@ -1,16 +1,13 @@
-// Supported UI languages (2026-09-27). Adding a language: add its code
-// here, drop a matching dictionary file in ./dictionaries, and it shows up
-// in the language switcher automatically — no other code changes needed.
-export const LOCALES = ["en", "es", "fr"] as const;
+// Available UI languages. Vietnamese is the default for Restaurant FNB.
+export const LOCALES = ["vi", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
 
 export const LOCALE_LABELS: Record<Locale, string> = {
+  vi: "Tiếng Việt",
   en: "English",
-  es: "Español",
-  fr: "Français",
 };
 
-export const DEFAULT_LOCALE: Locale = "en";
+export const DEFAULT_LOCALE: Locale = "vi";
 
 export function isLocale(value: string | null | undefined): value is Locale {
   return !!value && (LOCALES as readonly string[]).includes(value);

@@ -14,10 +14,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "./locales";
 import en from "./dictionaries/en.json";
-import es from "./dictionaries/es.json";
-import fr from "./dictionaries/fr.json";
+import vi from "./dictionaries/vi.json";
 
-const DICTIONARIES: Record<Locale, Record<string, string>> = { en, es, fr };
+const DICTIONARIES: Record<Locale, Record<string, string>> = { vi, en };
 const STORAGE_KEY = "nodedr-locale";
 
 function detectBrowserLocale(): Locale {
