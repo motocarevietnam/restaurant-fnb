@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ token: 
     orientation: "landscape",
     background_color: "#fbf9f8",
     theme_color: "#9f1239",
-    lang: "es",
+    lang: "vi",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
