@@ -1,5 +1,6 @@
 import { CalendarPlus, ChefHat, LayoutGrid, ShoppingCart, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
+import { useI18n } from "@/lib/i18n/context";
 import { Button } from "@/components/ui/button";
 
 const ACTIONS = [
@@ -14,12 +15,14 @@ const ACTIONS = [
 // right under the header so it's the first thing visible, not buried below
 // the stat cards.
 export function QuickActions() {
+  const { locale } = useI18n();
+  const names: Record<string,string> = {"/pos": "Tạo đơn mới", "/tables": "Bàn", "/reservations": "Đặt bàn mới", "/kds": "Màn hình bếp", "/menu": "Thực đơn"};
   return (
     <div className="flex flex-wrap gap-2">
       {ACTIONS.map((action) => (
         <Button key={action.href} variant="outline" size="sm" render={<Link href={action.href} />}>
           <action.icon className="h-4 w-4" />
-          {action.label}
+          {locale === "vi" ? names[action.href] : action.label}
         </Button>
       ))}
     </div>

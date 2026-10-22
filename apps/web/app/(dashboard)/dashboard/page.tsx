@@ -16,6 +16,7 @@ import { useManagedOrders } from "@/hooks/use-orders";
 import { openEntity } from "@/lib/entity-events";
 import { useDashboardSummary, useDashboardTrends } from "@/hooks/use-dashboard";
 import { formatCurrency } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 
 const ONLINE_ORDER_TYPES = new Set(["QR_ORDER", "KIOSK"]);
@@ -67,6 +68,8 @@ function TableStatusRow({ label, count, dotClass }: { label: string; count: numb
 
 export default function DashboardPage() {
   const { branchId } = useBranch();
+  const { locale } = useI18n();
+  const tr = (en: string, vi: string) => locale === "vi" ? vi : en;
   const { data, isLoading } = useDashboardSummary(branchId);
   const { data: trends, isLoading: trendsLoading } = useDashboardTrends(branchId);
   const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
@@ -74,8 +77,8 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-[32px] font-semibold tracking-tight text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Real-time overview of today&apos;s service</p>
+        <h1 className="text-[32px] font-semibold tracking-tight text-foreground"> {tr("Dashboard", "Tổng quan")}</h1>
+        <p className="text-sm text-muted-foreground">{tr("Real-time overview of today’s service", "Tổng quan hoạt động hôm nay theo thời gian thực")}</p>
       </div>
 
       <OrderDetailDialog
@@ -100,21 +103,21 @@ export default function DashboardPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
-            label="Today's Revenue"
+            label={tr("Today’s Revenue", "Doanh thu hôm nay")}
             value={formatCurrency(data.todayRevenue)}
             icon={Wallet}
             accent="success"
           />
           <Link href="/orders" className="block rounded-xl transition hover:opacity-90" title="Manage orders">
-            <StatCard label="Today's Orders" value={String(data.todayOrders)} icon={ReceiptText} />
+            <StatCard label={tr("Today’s Orders", "Đơn hôm nay")} value={String(data.todayOrders)} icon={ReceiptText} />
           </Link>
           <StatCard
-            label="Occupied Tables"
+            label={tr("Occupied Tables", "Bàn đang sử dụng")}
             value={String(data.tables.occupied)}
             icon={ClipboardList}
           />
           <StatCard
-            label="Kitchen Queue"
+            label={tr("Kitchen Queue", "Đơn chờ bếp")}
             value={String(
               data.kitchenQueue.new + data.kitchenQueue.accepted + data.kitchenQueue.preparing,
             )}
@@ -126,36 +129,36 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <TrendChart
-          title="Revenue — last 14 days"
+          title={tr("Revenue — last 14 days", "Doanh thu 14 ngày gần đây")}
           icon={TrendingUp}
           data={trends?.revenue ?? []}
           valueKey="amount"
           color="var(--success)"
           valueFormatter={(v) => formatCurrency(v)}
           isLoading={trendsLoading}
-          emptyMessage="No paid orders in the last 14 days yet."
+          emptyMessage={tr("No paid orders in the last 14 days yet.", "Chưa có đơn đã thanh toán trong 14 ngày qua.")}
         />
         <TrendChart
-          title="Food waste cost — last 14 days"
+          title={tr("Food waste cost — last 14 days", "Chi phí hao hụt thực phẩm 14 ngày")}
           icon={Trash2}
           data={trends?.waste ?? []}
           valueKey="cost"
           color="var(--warning)"
           valueFormatter={(v) => formatCurrency(v)}
           isLoading={trendsLoading}
-          emptyMessage="No waste logged in the last 14 days — nice."
+          emptyMessage={tr("No waste logged in the last 14 days — nice.", "Chưa ghi nhận hao hụt thực phẩm trong 14 ngày qua.")}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card className="flex flex-col gap-1 p-6 lg:col-span-1">
-          <h2 className="mb-3 text-[18px] font-medium text-foreground">Tables</h2>
+          <h2 className="mb-3 text-[18px] font-medium text-foreground">{tr("Tables", "Bàn")}</h2>
           {data && (
             <>
-              <TableStatusRow label="Available" count={data.tables.available} dotClass="bg-success" />
-              <TableStatusRow label="Occupied" count={data.tables.occupied} dotClass="bg-primary" />
-              <TableStatusRow label="Reserved" count={data.tables.reserved} dotClass="bg-warning" />
-              <TableStatusRow label="Cleaning" count={data.tables.cleaning} dotClass="bg-muted-foreground" />
+              <TableStatusRow label={tr("Available", "Còn trống")} count={data.tables.available} dotClass="bg-success" />
+              <TableStatusRow label={tr("Occupied", "Đang sử dụng")} count={data.tables.occupied} dotClass="bg-primary" />
+              <TableStatusRow label={tr("Reserved", "Đã đặt trước")} count={data.tables.reserved} dotClass="bg-warning" />
+              <TableStatusRow label={tr("Cleaning", "Đang dọn")} count={data.tables.cleaning} dotClass="bg-muted-foreground" />
             </>
           )}
         </Card>
@@ -163,14 +166,14 @@ export default function DashboardPage() {
         <Card className="flex flex-col gap-1 p-6 lg:col-span-1">
           <h2 className="mb-3 flex items-center gap-2 text-[18px] font-medium text-foreground">
             <ChefHat className="h-[18px] w-[18px] text-muted-foreground" />
-            Kitchen queue
+            {tr("Kitchen queue", "Hàng chờ bếp")}
           </h2>
           {data && (
             <>
-              <TableStatusRow label="New" count={data.kitchenQueue.new} dotClass="bg-primary" />
-              <TableStatusRow label="Accepted" count={data.kitchenQueue.accepted} dotClass="bg-warning" />
-              <TableStatusRow label="Preparing" count={data.kitchenQueue.preparing} dotClass="bg-warning" />
-              <TableStatusRow label="Ready" count={data.kitchenQueue.ready} dotClass="bg-success" />
+              <TableStatusRow label={tr("New", "Mới")} count={data.kitchenQueue.new} dotClass="bg-primary" />
+              <TableStatusRow label={tr("Accepted", "Đã nhận")} count={data.kitchenQueue.accepted} dotClass="bg-warning" />
+              <TableStatusRow label={tr("Preparing", "Đang chế biến")} count={data.kitchenQueue.preparing} dotClass="bg-warning" />
+              <TableStatusRow label={tr("Ready", "Sẵn sàng")} count={data.kitchenQueue.ready} dotClass="bg-success" />
             </>
           )}
         </Card>
@@ -178,11 +181,11 @@ export default function DashboardPage() {
         <Card className="flex flex-col gap-3 p-6 lg:col-span-1">
           <h2 className="flex items-center gap-2 text-[18px] font-medium text-foreground">
             <Timer className="h-[18px] w-[18px] text-muted-foreground" />
-            Recent transactions
+            {tr("Recent transactions", "Giao dịch gần đây")}
           </h2>
           <div className="flex flex-col divide-y divide-border">
             {data?.recentOrders.length === 0 && (
-              <p className="py-4 text-sm text-muted-foreground">No sales yet today.</p>
+              <p className="py-4 text-sm text-muted-foreground">{tr("No sales yet today.", "Hôm nay chưa có giao dịch.")}</p>
             )}
             {data?.recentOrders.map((order) => {
               const isOnline = ONLINE_ORDER_TYPES.has(order.type);
@@ -192,7 +195,7 @@ export default function DashboardPage() {
                   type="button"
                   onClick={() => setViewingOrderId(order.id)}
                   className="flex items-center justify-between py-2.5 text-left text-sm transition hover:opacity-80"
-                  title="View order details"
+                  title={tr("View order details", "Xem chi tiết đơn")}
                 >
                   <div className="flex flex-col">
                     <span className="font-medium text-foreground">#{order.orderNumber}</span>
@@ -226,15 +229,15 @@ export default function DashboardPage() {
         <Card className="flex flex-col gap-3 p-6 lg:col-span-1">
           <h2 className="flex items-center gap-2 text-[18px] font-medium text-foreground">
             <ReceiptText className="h-[18px] w-[18px] text-muted-foreground" />
-            Order channels
+            {tr("Order channels", "Kênh đặt món")}
           </h2>
-          <p className="text-xs text-muted-foreground">Today, self-serve vs staff-entered</p>
+          <p className="text-xs text-muted-foreground">{tr("Today, self-serve vs staff-entered", "Hôm nay: khách tự đặt và nhân viên tạo đơn")}</p>
           {data && (
             <>
               <div className="flex items-center justify-between py-1.5 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Globe className="h-3.5 w-3.5" />
-                  Online (QR / kiosk)
+                  {tr("Online (QR / kiosk)", "Trực tuyến (QR / kiosk)")}
                 </div>
                 <span className="font-medium tabular-nums text-foreground">
                   {data.channels.online}
@@ -243,7 +246,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between py-1.5 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Store className="h-3.5 w-3.5" />
-                  Offline (dine-in / takeaway / phone)
+                  {tr("Offline (dine-in / takeaway / phone)", "Tại quán / mang đi / điện thoại")}
                 </div>
                 <span className="font-medium tabular-nums text-foreground">
                   {data.channels.offline}
@@ -271,15 +274,16 @@ export default function DashboardPage() {
 
 // Online orders waiting for a decision — shown on top so they can't be missed.
 function PendingOrdersBanner({ branchId }: { branchId: string | null }) {
+  const { locale } = useI18n();
   const { data } = useManagedOrders(branchId, "pending");
   if (!data || data.length === 0) return null;
   return (
     <Card className="flex flex-col gap-3 border-primary/40 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p className="text-sm font-semibold text-foreground">
-          {data.length} online order{data.length === 1 ? "" : "s"} waiting for you
+          {locale === "vi" ? `${data.length} đơn trực tuyến đang chờ xử lý` : `${data.length} online order${data.length === 1 ? "" : "s"} waiting for you`}
         </p>
-        <p className="text-xs text-muted-foreground">Accept or reject so the kitchen can start.</p>
+        <p className="text-xs text-muted-foreground">{locale === "vi" ? "Xác nhận hoặc từ chối để bếp bắt đầu chế biến." : "Accept or reject so the kitchen can start."}</p>
       </div>
       <div className="flex gap-2">
         <button
@@ -287,10 +291,10 @@ function PendingOrdersBanner({ branchId }: { branchId: string | null }) {
           onClick={() => openEntity("Order", data[0].id)}
           className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground"
         >
-          Review #{data[0].orderNumber}
+          {locale === "vi" ? "Xem đơn" : "Review"} #{data[0].orderNumber}
         </button>
         <Link href="/orders" className="rounded-lg border border-border px-3 py-1.5 text-sm">
-          All orders
+          {locale === "vi" ? "Tất cả đơn hàng" : "All orders"}
         </Link>
       </div>
     </Card>
